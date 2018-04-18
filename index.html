@@ -1,0 +1,170 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+
+  <title>Arecibo message generator</title>
+  <meta name="description" content="Arecibo message generator build in HTML and JS">
+  <meta name="author" content="Adrian Meresescu">
+
+  <!-- Bootstrap css -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+  <!-- Font-->
+  <link href="https://fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet">
+
+  <style>
+    * {
+      font-family: 'Inconsolata', monospace;
+      font-family: monospace;
+    }
+
+    .pixel {
+      cursor: pointer;
+    }
+
+    .pixel.active {
+      background: #000000;
+      color: #ffffff;
+    }
+
+    #code {
+      word-wrap: break-word;
+    }
+
+    #draw-area,
+    #code {
+      font-size: 12px;
+
+    }
+  </style>
+
+</head>
+
+<body class="bg-light">
+
+  <div class="container">
+    <div class="py-5 text-center">
+      <h2>Arecibo Signal Generator</h2>
+    </div>
+    <div class="row">
+      <div class="col-md-5 col-sm-12">
+        <h4 class="mb-3">Draw area</h4>
+        <div class="card">
+          <div class="card-body text-center" id="draw-area"></div>
+        </div>
+      </div>
+      <div class="col-md-2 col-sm-12 py-5">
+        <button id="generate" class="btn btn-primary btn-lg btn-block" type="submit">Generate &rarr;</button>
+        <hr class="mb-4">
+        <h4 class="mb-3">Customize</h4>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="width">Width</label>
+            <input type="number" class="form-control" id="width" placeholder="" value="23" required="">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="height">Height</label>
+            <input type="number" class="form-control" id="height" placeholder="" value="73" required="">
+          </div>
+          <div class="col-md-6 mb-3">
+            <button type="button" class="btn btn-outline-secondary" id="update-draw-area">Update draw area</button>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-5 col-sm-12">
+        <h4 class="mb-3">Signal</h4>
+        <div class="card">
+          <div class="card-body" id="code">
+            <span class="text-muted">Click Generate</span>
+          </div>
+        </div>
+        <div class="mb-3 py-1">
+          <button type="button" class="btn btn-outline-secondary d-none " id="copy-signal">Copy to clipboard</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="my-5 pt-5 text-muted text-center text-small">
+    <p class="mb-1">Learn more about</p>
+    <ul class="list-inline">
+      <li class="list-inline-item"><a href="https://en.wikipedia.org/wiki/Arecibo_message" target="_blank">Arcibo message on wikipedia</a></li>
+      <li class="list-inline-item"><a href="https://getbootstrap.com/" target="_blank">Bootstrap</a></li>
+    </ul>
+  </footer>
+  <!-- Bootstrap JS-->
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+  <script type="text/javascript">
+
+    $(document).ready(function() {
+
+      var code = [];
+      var width = 23;
+      var height = 73;
+
+      function populateDrawArea() {
+        $('#draw-area').empty();
+        var drawAreaContents = '';
+        for (var i = 1; i <= width * height; i++) {
+          code.push(0);
+          drawAreaContents += '<span data-id="' + i + '" class="pixel">0</span>';
+          if (i % width == 0) {
+            drawAreaContents += '<br>';
+          }
+        }
+        $('#draw-area').append(drawAreaContents);
+      }
+
+      $("#draw-area").on("click", ".pixel", function() {
+        if ($(this).hasClass('active')) {
+          $(this).removeClass('active');
+          $(this).html(0);
+          code[$(this).data('id')] = 0;
+
+        } else {
+          $(this).addClass('active');
+          $(this).html(1);
+          code[$(this).data('id')] = 1;
+        }
+      });
+
+      $('#generate').click(function() {
+        $('#code').empty();
+        $('#copy-signal').removeClass('d-none');
+        for (var i = 1; i <= width * height; i++) {
+          $('#code').append(code[i]);
+        }
+      });
+
+      $('#update-draw-area').click(function() {
+        width = $('#width').val();
+        height = $('#height').val();
+
+        populateDrawArea();
+      });
+
+      $('#copy-signal').click(function() {
+        var textarea = document.createElement('textarea');
+        textarea.id = 'temp_element';
+        textarea.style.height = 0;
+        document.body.appendChild(textarea);
+        textarea.value = document.getElementById('code').innerText;
+        var selector = document.querySelector('#temp_element');
+        selector.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+      });
+
+      // initial draw area populate
+      populateDrawArea();
+    });
+  </script>
+
+</body>
+
+</html>
