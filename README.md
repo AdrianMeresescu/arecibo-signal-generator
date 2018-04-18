@@ -12,6 +12,10 @@ Click in the draw area on pixels to highlight the shapes you want to "encode". W
 
 Just download and launch index.html.
 
+## Demo
+
+Go to this [link](https://adrianmeresescu.github.io/arecibo-signal-generator/index.html) to see the app in action.
+
 ## Built With
 
 * [Bootstrap](https://getbootstrap.com/) - open source toolkit
